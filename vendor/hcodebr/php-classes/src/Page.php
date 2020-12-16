@@ -8,7 +8,9 @@ class Page {
 
     private $tpl;
     private $options = [];
-    private $defaults = [   //Remover?
+    private $defaults = [
+        "header" => true,
+        "footer" => true,  //Remover?
         "data"=>[]
     ];
 
@@ -19,7 +21,7 @@ class Page {
         $config = array(
             "tpl_dir"       => $_SERVER["DOCUMENT_ROOT"].$tpl_dir,
             "cache_dir"     => $_SERVER["DOCUMENT_ROOT"]."/views-cache/",
-            "debug"         => false
+            "debug"         => false    //Comentarios de erros e testes
         );
 
         Tpl::configure( $config );
@@ -28,7 +30,7 @@ class Page {
 
         $this->setData($this->options["data"]);
 
-        $this->tpl->draw("header");
+        if ($this->options["header"] === true) $this->tpl->draw("header");
 
     }
 
@@ -54,7 +56,7 @@ class Page {
 
     public function __destruct(){
 
-        $this->tpl->draw("footer");
+        if ($this->options["footer"] === true) $this->tpl->draw("footer");
 
     }
 

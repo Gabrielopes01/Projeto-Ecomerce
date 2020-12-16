@@ -1,10 +1,11 @@
 <?php
-
+session_start();
 require_once("vendor/autoload.php");
 
 use \Slim\Slim;
 use \Classes\Page;
 use \Classes\PageAdmin;
+use \Classes\Model\User;
 
 $app = new Slim();
 
@@ -22,12 +23,47 @@ $app->get('/', function() {
 
 $app->get('/admin', function() {
 
+    User::verifyLogin();
+
     $page = new PageAdmin();
 
     $page->setTpl("index");
 
     //Destruct é chamado no fim do PHP, chamando o footer
 
+});
+
+$app->get('/admin/login', function() {
+
+
+    $page = new PageAdmin([
+        "header" => false,
+        "footer" => false
+    ]);
+
+    $page->setTpl("login");
+
+    //Destruct é chamado no fim do PHP, chamando o footer
+
+});
+
+$app->post('/admin/login', function(){
+
+    User::login($_POST["deslogin"], $_POST["despassword"]);
+
+    header("Location: /admin");
+
+    exit;
+
+});
+
+
+$app->get('/admin/logout', function(){
+
+    User::logout();
+
+    header("Location: /admin/login");
+    exit;
 });
 
 $app->run();

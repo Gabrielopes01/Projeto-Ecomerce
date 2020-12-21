@@ -29,7 +29,7 @@ private static $installed = array (
     'aliases' => 
     array (
     ),
-    'reference' => '889b336ef5df23b86aee61a12f94ea2cd329721d',
+    'reference' => '0834b7664d9efb5da875adc8c35348da3717f191',
     'name' => 'hcodebr/ecommerce',
   ),
   'versions' => 
@@ -41,16 +41,16 @@ private static $installed = array (
       'aliases' => 
       array (
       ),
-      'reference' => '889b336ef5df23b86aee61a12f94ea2cd329721d',
+      'reference' => '0834b7664d9efb5da875adc8c35348da3717f191',
     ),
     'phpmailer/phpmailer' => 
     array (
-      'pretty_version' => 'v5.2.22',
-      'version' => '5.2.22.0',
+      'pretty_version' => 'v6.2.0',
+      'version' => '6.2.0.0',
       'aliases' => 
       array (
       ),
-      'reference' => 'b18cb98131bd83103ccb26a888fdfe3177b8a663',
+      'reference' => 'e38888a75c070304ca5514197d4847a59a5c853f',
     ),
     'rain/raintpl' => 
     array (

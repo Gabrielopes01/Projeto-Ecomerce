@@ -4,6 +4,7 @@ use \Classes\Page;
 use \Classes\Model\Product;
 use \Classes\Model\User;
 use \Classes\Model\Category;
+use \Classes\Model\Cart;
 
 $app->get('/', function() {
 
@@ -33,7 +34,7 @@ $app->get("/categories/:idcategory", function($idcategory){
 
     $pages = [];
 
-    for ($i=1; $i <= $pagination["pages"] ; $i++) { 
+    for ($i=1; $i <= $pagination["pages"] ; $i++) {
         array_push($pages, [
             "link"=>"/categories/".$category->getidcategory()."?page=".$i,
             "page"=>$i
@@ -66,6 +67,14 @@ $app->get("/products/:desurl", function($desurl) {
 
 });
 
+$app->get("/cart", function(){
 
+    $cart = Cart::getFromSession();
+
+    $page = new Page();
+
+    $page->setTpl("cart");
+
+})
 
 ?>

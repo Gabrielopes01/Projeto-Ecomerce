@@ -13,6 +13,26 @@ class User extends Model{
     const SECRET_IV = "senhasenha123456";
     const ERROR = "UserError";
     const ERROR_REGISTER = "UserErrorRegister";
+    const SUCESS = "UserSucess";
+
+//Pegar valores da pessoa
+    public static function getPersonValues($user, $iduser){
+
+        $sql = new Sql();
+
+        $result = $sql->select("
+            SELECT b.idperson, b.desperson, b.desemail, b.nrphone
+            FROM tb_users a
+            INNER JOIN tb_persons b ON a.idperson = b.idperson
+            WHERE a.iduser = :iduser", [
+                ":iduser"=>$iduser
+            ]
+        );
+
+        $user->setData($result[0]);
+
+    }
+
 
     public static function getFromSession(){
 
@@ -380,6 +400,29 @@ class User extends Model{
         ]);
 
         return (count($results) > 0);
+
+    }
+
+
+    public static function setSucess($msg){
+
+        $_SESSION[User::SUCESS] = $msg;
+
+    }
+
+    public static function getSucess(){
+
+        $msg = (isset($_SESSION[User::SUCESS]) && $_SESSION[User::SUCESS]) ? $_SESSION[User::SUCESS] : "";
+
+        User::clearSucess();
+
+        return $msg;
+
+    }
+
+    public static function clearSucess(){
+
+        $_SESSION[User::SUCESS] = NULL;
 
     }
 

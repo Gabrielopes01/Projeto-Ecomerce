@@ -102,7 +102,7 @@ $app->get("/cart/:idproduct/add", function($idproduct){
 
 });
 
-//Redmove apenas um item do carrinho
+//Remove apenas um item do carrinho
 $app->get("/cart/:idproduct/minus", function($idproduct){
 
     $product = new Product();
@@ -118,6 +118,7 @@ $app->get("/cart/:idproduct/minus", function($idproduct){
 
 });
 
+//Remoção de Produto
 $app->get("/cart/:idproduct/remove", function($idproduct){
 
     $product = new Product();
@@ -133,7 +134,7 @@ $app->get("/cart/:idproduct/remove", function($idproduct){
 
 });
 
-
+//Frete
 $app->post("/cart/freight", function(){
 
     $cart = Cart::getFromSession();
@@ -145,7 +146,7 @@ $app->post("/cart/freight", function(){
 
 });
 
-
+//Checando informaçoes antes da compra
 $app->get("/checkout", function(){
 
     User::verifyLogin(false);
@@ -169,12 +170,14 @@ $app->get("/login", function(){
     $page = new Page();
 
     $page->setTpl("login", [
-        "error"=>User::getError()
+        "error"=>User::getError(),
+        "errorRegister"=>User::getErrorRegister(),
+        "registerValues"=>(isset($_SESSION["registerValues"])) ? $_SESSION["registerValues"] : ["name"=>"", "email"=>"", "phone"=>""]
     ]);
 
 });
 
-
+//Acessar o site de usuario via Login
 $app->post("/login", function(){
 
     try{
@@ -194,11 +197,70 @@ $app->post("/login", function(){
 
 });
 
+//Deslogar do site de usuario
 $app->get("/logout", function(){
 
     User::logout();
 
     header("Location: /login");
+    exit;
+
+});
+
+
+//Registro de usuarios
+$app->post("/register", function(){
+
+    $_SESSION["registerValues"] = $_POST;
+
+    if (!isset($_POST["name"]) || $_POST["name"] == "") {
+
+        User::setErrorRegister("Preencha o seu nome de usuário");
+        header("Location: /login");
+        exit;
+
+    }
+
+   if (!isset($_POST["email"]) || $_POST["email"] == "") {
+
+        User::setErrorRegister("Preencha o seu email");
+        header("Location: /login");
+        exit;
+
+    }
+
+    if (!isset($_POST["password"]) || $_POST["password"] == "") {
+
+        User::setErrorRegister("Preencha a senha");
+        header("Location: /login");
+        exit;
+
+    }
+
+    if (User::checkLoginExists($_POST["email"]) === true){
+
+        User::setErrorRegister("Este endereço de email ja está sendo usado por outro usuário");
+        header("Location: /login");
+        exit;
+        
+    }
+
+    $user = new User();
+
+    $user->setData([
+        "inadmin"=>0,
+        "deslogin"=>$_POST["email"],
+        "desperson"=>$_POST["name"],
+        "desemail"=>$_POST["email"],
+        "despassword"=>$_POST["password"],
+        "nrfone"=>$_POST["phone"]
+    ]);
+
+    $user->save();
+
+    User::login($_POST["email"], $_POST["password"]);
+
+    header("Location: /checkout");
     exit;
 
 });

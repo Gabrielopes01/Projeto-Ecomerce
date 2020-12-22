@@ -242,7 +242,7 @@ $app->post("/register", function(){
         User::setErrorRegister("Este endereço de email ja está sendo usado por outro usuário");
         header("Location: /login");
         exit;
-        
+
     }
 
     $user = new User();
@@ -253,7 +253,7 @@ $app->post("/register", function(){
         "desperson"=>$_POST["name"],
         "desemail"=>$_POST["email"],
         "despassword"=>$_POST["password"],
-        "nrfone"=>$_POST["phone"]
+        "nrphone"=>$_POST["phone"]
     ]);
 
     $user->save();
@@ -262,6 +262,73 @@ $app->post("/register", function(){
 
     header("Location: /checkout");
     exit;
+
+});
+
+
+
+//Esqueceu Sua Senha
+$app->get("/forgot", function(){
+
+    $page = new Page();
+
+    $page->setTpl("forgot");
+
+});
+
+//Apos inserir dados na pagina de Forgot
+$app->post("/forgot", function(){
+
+    $user = User::getForgot($_POST["email"], false);
+
+    header("Location: /forgot/sent");
+    exit;
+
+});
+
+//Codigo Enviado ao email
+$app->get("/forgot/sent", function(){
+
+    $page = new Page();
+
+    $page->setTpl("forgot-sent");
+
+});
+
+//Pagina que o email redireciona
+$app->get("/forgot/reset", function(){
+
+    $user = User::validForgotDecrypt($_GET["code"]);
+
+    $page = new Page();
+
+    $page->setTpl("forgot-reset", array(
+        "name"=>$user["desperson"],
+        "code"=>$_GET["code"]
+    ));
+
+});
+
+//Tela para mudar a senha após a verificação
+$app->post("/forgot/reset", function(){
+
+    $forgot = User::validForgotDecrypt($_POST["code"]);
+
+    User::setForgotUsed($forgot["idrecovery"]);
+
+    $user = new User();
+
+    $user->get((int)$forgot["iduser"]);
+
+    $password = password_hash($_POST["password"], PASSWORD_DEFAULT, [
+        "cost"=>12
+    ]);
+
+    $user->setPassword($password); //Senha que veio do FORM
+
+    $page = new Page();
+
+    $page->setTpl("forgot-reset-success");
 
 });
 

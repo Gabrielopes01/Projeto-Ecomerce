@@ -111,6 +111,8 @@ class Cart extends Model{
         ]);
 
 
+
+
         $this->setData($results[0]);
 
     }
@@ -314,7 +316,7 @@ class Cart extends Model{
     }
 
 
-    public function getCalculateTotal(){
+    public function getCalculateTotal($get = 0){
 
         $this->updateFreight();
 
@@ -322,6 +324,12 @@ class Cart extends Model{
 
         $this->setvlsubtotal($totals["vlprice"]);
         $this->setvltotal($totals["vlprice"] + $this->getvlfreight());
+
+        if ($get === 1){
+
+            return $totals["vlprice"];
+
+        }
 
     }
 

@@ -320,7 +320,7 @@ class User extends Model{
     }
 
 //Função que altera a senha
-    public static function setPassword($password)
+    public function setPassword($password)
     {
 
         $sql = new Sql();

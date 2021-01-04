@@ -334,6 +334,39 @@ class Cart extends Model{
     }
 
 
+    public function defineIdUser($iduser){
+
+        $sql = new Sql();
+
+        $result = $sql->select("SELECT * FROM tb_carts WHERE iduser = :iduser", [
+            ":iduser"=>$iduser
+        ]);
+
+        if (count($result)===0){
+
+            $sql->query("INSERT tb_carts VALUES(0, :dessessionid, :iduser, :deszipcode, :vlfreight, :nrdays, NOW())", [
+            ":dessessionid"=>$this->getdessessionid(),
+            ":iduser"=>$iduser,
+            ":deszipcode"=>$this->getdeszipcode(),
+            ":vlfreight"=>$this->getvlfreight(),
+            ":nrdays"=>$this->getnrdays()
+            ]);
+
+        }else{
+
+           /* var_dump($iduser, $this->getidcart(), $result);
+            exit;*/
+
+            $sql->query("UPDATE tb_carts SET iduser = :iduser WHERE idcart = :idcart", [
+                ":iduser"=>$iduser,
+                ":idcart"=>$this->getidcart()
+            ]);
+
+        }
+
+
+    }
+
 
 }
 

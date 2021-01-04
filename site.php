@@ -74,6 +74,10 @@ $app->get("/cart", function(){
 
     $cart = Cart::getFromSession();
 
+    $user = User::getFromSession();
+
+ //   $cart->defineIdUser($user->getiduser());
+
     $page = new Page();
 
     $page->setTpl("cart", [
@@ -131,6 +135,10 @@ $app->get("/cart/:idproduct/remove", function($idproduct){
 
     $cart->removeProduct($product, true);
 
+    $cart->setvlfreight(0);
+
+    $cart->save();
+
     header("Location: /cart");
     exit;
 
@@ -157,6 +165,14 @@ $app->get("/checkout", function(){
 
     $cart = Cart::getFromSession();
 
+    if ($cart->getvltotal() === 0){
+
+        Cart::setMsgError("Você precisa ter um item em seu carrinho para finalizar a compra");
+        header("Location: /cart");
+        exit;
+
+    }
+
     if(isset($_GET["zipcode"])) {
 
         $_GET["zipcode"] = $cart->getdeszipcode();
@@ -176,6 +192,7 @@ $app->get("/checkout", function(){
     }
 
     if (!$address->getdesaddress()) $address->setdesaddress("");
+    if (!$address->getdesnumber()) $address->setdesnumber("");
     if (!$address->getdescomplement()) $address->setdescomplement("");
     if (!$address->getdesdistrict()) $address->setdesdistrict("");
     if (!$address->getdescity()) $address->setdescity("");
@@ -262,8 +279,69 @@ $app->post("/checkout", function(){
 
     $order->save();
 
-    header("Location: /order/".$order->getidorder());
+    switch ((int)$_POST["payment-method"]) {
+
+        case 1:
+        header("Location: /order/".$order->getidorder()."/pagseguro");
+        break;
+    
+        case 2:
+        header("Location: /order/".$order->getidorder()."/paypal");
+        break;
+
+    }
+
     exit;
+
+});
+
+$app->get("/order/:idorder/pagseguro", function($idorder){
+
+    User::verifyLogin();
+
+    $order = new Order();
+
+    $order->get((int)$idorder);
+
+    $cart = $order->getCart();
+
+    $page = new Page([
+        "header"=>false,
+        "footer"=>false
+    ]);
+
+    $page->setTpl("payment-pagseguro", [
+        "order"=>$order->getValues(),
+        "cart"=>$cart->getValues(),
+        "products"=>$cart->getProducts(),
+        "phone"=>[
+            "areaCode"=>substr($order->getnrphone(), 0, 2),
+            "number"=>substr($order->getnrphone(), 2, strlen($order->getnrphone()))
+        ]
+    ]);
+
+});
+
+$app->get("/order/:idorder/paypal", function($idorder){
+
+    User::verifyLogin();
+
+    $order = new Order();
+
+    $order->get((int)$idorder);
+
+    $cart = $order->getCart();
+
+    $page = new Page([
+        "header"=>false,
+        "footer"=>false
+    ]);
+
+    $page->setTpl("payment-paypal", [
+        "order"=>$order->getValues(),
+        "cart"=>$cart->getValues(),
+        "products"=>$cart->getProducts(),
+    ]);
 
 });
 
